@@ -1,0 +1,10 @@
+/var/log/metabase/*.log {
+  daily
+  missingok
+  rotate 7
+  size 500M
+  compress
+  delaycompress
+  notifempty
+  copytruncate
+}

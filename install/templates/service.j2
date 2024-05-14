@@ -1,0 +1,21 @@
+[Unit]
+Description=Metabase server
+After=syslog.target
+After=network.target
+
+[Service]
+WorkingDirectory={{ metabase_directory }}/
+ExecStart=/usr/bin/java -jar {{ metabase_directory }}/metabase.jar
+EnvironmentFile=/etc/default/metabase
+User={{ ansible_user }}
+Group={{ ansible_user }}
+Type=simple
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=metabase
+SuccessExitStatus=143
+TimeoutStopSec=120
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

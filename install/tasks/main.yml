@@ -1,0 +1,6 @@
+---
+# tasks file for install (metabase)
+- import_tasks: selinux.yml
+- import_tasks: java.yml
+- import_tasks: metabase.yml
+- import_tasks: nginx.yml

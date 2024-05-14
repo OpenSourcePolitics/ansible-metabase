@@ -1,0 +1,8 @@
+- hosts: all
+  gather_facts: false    
+
+  vars:
+    ansible_remote_tmp: /tmp/.ansible/tmp
+        
+  roles:
+    - install

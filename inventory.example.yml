@@ -1,0 +1,20 @@
+all:
+  hosts:
+    metabase-server:
+      ansible_host: # IP address or hostname
+      distribution_name: "rhel" # rocky | centos | rhel 
+      java_package: "temurin-11-jre"
+      metabase_version: "v0.48.3" # see https://github.com/metabase/metabase/releases
+      metabase_checksum: "5cf9938bf6710bcbf548f01f388fdbccdca9d5bb0c290ce9de6472f4e21d4e1e" # see https://github.com/metabase/metabase/releases
+      metabase_directory: "/home/{{ ansible_user }}"
+      metabase_external_host: # hostname without protocol or port like metabase.example.org
+      metabase_database_host: # IP address or hostname
+      metabase_database_port: "5432"
+      metabase_database_user: 
+      metabase_database_password: 
+      metabase_database_name: 
+      ssl_certificate_path: "/home/{{ ansible_user }}/ssl/fullchain.pem"
+      ssl_private_key_path: "/home/{{ ansible_user }}/ssl/privkey.pem" 
+      ssl_upload_directory: "/home/{{ ansible_user }}/ssl" # Optional
+      ssl_upload_certificate_path: # local path - Optional
+      ssl_upload_private_key_path: # local path - Optional

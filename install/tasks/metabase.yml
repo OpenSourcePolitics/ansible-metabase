@@ -1,0 +1,89 @@
+- name: METABASE | Download JAR file with checksum (sha256)
+  ansible.builtin.get_url:
+    url: "https://downloads.metabase.com/{{ metabase_version }}/metabase.jar"
+    dest: "{{ metabase_directory }}/metabase.jar"
+    checksum: "sha256:{{ metabase_checksum }}"
+
+- name: METABASE | Add execution permission to ansible / metabase user
+  shell:
+    cmd: "chmod g+x,o+x {{ metabase_directory }}/"
+  become: true
+
+# Service configuration
+
+- name: METABASE | Create metabase.service file
+  ansible.builtin.file:
+    path: "/etc/systemd/system/metabase.service"
+    state: touch
+  become: true
+
+- name: METABASE | Set metabase service configuration
+  template:
+    src: templates/service.j2
+    dest: "/etc/systemd/system/metabase.service" 
+  become: true
+
+# Log configuration
+
+- name: METABASE | Create metabase log directory
+  ansible.builtin.file:
+    path: "/var/log/metabase"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: directory
+  become: true
+
+- name: METABASE | Create metabase rsyslog configuration file
+  ansible.builtin.file:
+    path: "/etc/rsyslog.d/metabase.conf"
+    state: touch
+  become: true
+
+- name: METABASE | Set metabase rsyslog configuration
+  template:
+    src: templates/rsyslog.conf.j2
+    dest: "/etc/rsyslog.d/metabase.conf" 
+  become: true
+
+- name: Logrotate | Set logrotate configuration
+  template:
+    src: templates/logrotate.j2
+    dest: "/etc/logrotate.d/metabase"
+  become: true
+
+# Environment variables
+
+- name: METABASE | Create metabase environment configuration file
+  ansible.builtin.file:
+    path: "/etc/default/metabase"
+    state: touch
+  become: true
+
+- name: METABASE | Set metabase environment configuration
+  template:
+    src: templates/env.j2
+    dest: "/etc/default/metabase" 
+  become: true
+
+# Services start & restart
+
+- name: METABASE | Start and enable metabase service
+  ansible.builtin.systemd:
+    name: metabase
+    state: started
+    enabled: yes
+  become: true
+
+- name: METABASE | Restart metabase service
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: metabase
+  become: true
+
+- name: METABASE | Restart rsyslog service
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: rsyslog
+  become: true

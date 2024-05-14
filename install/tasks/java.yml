@@ -1,0 +1,12 @@
+- name: JAVA | add repository
+  template:
+    src: templates/adoptium.repo.j2
+    dest: /etc/yum.repos.d/adoptium.repo
+  become: true
+
+- name: JAVA | main package
+  dnf:
+    name: 
+      - "{{ java_package }}"
+    state: latest
+  become: true

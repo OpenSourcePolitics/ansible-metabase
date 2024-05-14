@@ -1,0 +1,61 @@
+- name: NGINX | Install Nginx
+  dnf:
+    name: nginx
+    state: latest
+  become: true
+
+- name: NGINX | Set vhost config
+  template:
+    src: templates/nginx.site.j2
+    dest: "/etc/nginx/conf.d/metabase.site.conf"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0664"
+  become: true
+
+## SSL certificate
+
+- name: NGINX | Create SSL directory if specified in inventory (ssl_upload_directory)
+  ansible.builtin.file:
+    path: "{{ ssl_upload_directory }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    state: directory
+  become: true
+  when: ssl_upload_directory is defined
+
+- name: NGINX | Upload SSL certificate if specified in inventory (ssl_upload_certificate_path)
+  ansible.builtin.copy:
+    src: "{{ ssl_upload_certificate_path }}"
+    dest: "{{ ssl_certificate_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0664"
+    remote_src: false 
+  when: ssl_upload_certificate_path is defined
+
+- name: NGINX | Upload SSL private key if specified in inventory (ssl_upload_private_key_path)
+  ansible.builtin.copy:
+    src: "{{ ssl_upload_private_key_path }}"
+    dest: "{{ ssl_private_key_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0664"
+    remote_src: false 
+  when: ssl_upload_private_key_path is defined
+
+## Service
+
+- name: NGINX | Start and enable service Nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: yes
+  become: true
+
+- name: NGINX | Restart Nginx service
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: metabase
+  become: true
